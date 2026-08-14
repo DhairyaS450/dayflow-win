@@ -118,6 +118,8 @@ if (!gotLock) {
     })
 
     // ----- Startup sequence (parity with upstream AppDelegate) -----
+    screenRecorder.init()
+    pauseManager.init()
     initDb()
     startDbMaintenance()
     startRetentionTimers()

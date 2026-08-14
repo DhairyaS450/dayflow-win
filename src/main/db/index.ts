@@ -9,6 +9,7 @@ import {
   statSync
 } from 'fs'
 import { dataRoot, dbPath, recordingsDir } from '../lib/paths'
+import { migrate } from './schema'
 
 let db: BetterSqlite3.Database | null = null
 
@@ -106,7 +107,6 @@ export function initDb(): BetterSqlite3.Database {
     console.warn('[db] quick_check failed', err)
   }
   // Schema migration
-  const { migrate } = require('./schema') as typeof import('./schema')
   migrate(db)
   return db
 }

@@ -21,7 +21,12 @@ export class ScreenRecorder {
   private tracker = new ActiveDisplayTracker()
   private capturing = false
 
-  constructor() {
+  private initialized = false
+
+  /** Must be called after app 'ready' — touches screen + powerMonitor. */
+  init(): void {
+    if (this.initialized) return
+    this.initialized = true
     this.tracker.start()
     this.tracker.onChange((id) => this.handleActiveDisplayChange(id))
     this.registerPowerEvents()

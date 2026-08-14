@@ -20,7 +20,12 @@ export class PauseManager {
   private timer: NodeJS.Timeout | null = null
   private listeners = new Set<Listener>()
 
-  constructor() {
+  private initialized = false
+
+  /** Must be called after app 'ready' — touches powerMonitor. */
+  init(): void {
+    if (this.initialized) return
+    this.initialized = true
     powerMonitor.on('resume', () => {
       if (this.pauseEndTime !== null && Date.now() >= this.pauseEndTime) {
         this.resume('wake_from_sleep')

@@ -17,7 +17,9 @@ function settingsPath(): string {
 function load(): SettingsMap {
   if (cache) return cache
   try {
-    cache = JSON.parse(readFileSync(settingsPath(), 'utf-8')) as SettingsMap
+    // Strip a UTF-8 BOM if present (files written by PowerShell often have one).
+    const raw = readFileSync(settingsPath(), 'utf-8').replace(/^﻿/, '')
+    cache = JSON.parse(raw) as SettingsMap
   } catch {
     cache = {}
   }

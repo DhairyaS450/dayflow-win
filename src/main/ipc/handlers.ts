@@ -9,6 +9,7 @@ import { appState } from '../app/appState'
 import { pauseManager, type PauseDuration } from '../recording/pauseManager'
 import { testGeminiConnection } from '../providers/gemini'
 import { testLocalConnection } from '../providers/ollama'
+import { testClaudeCli, resolveClaudeCli } from '../providers/claudeCli'
 import { currentUsage, purgeRecordingsIfNeeded, purgeTimelapsesIfNeeded } from '../db/maintenance'
 import { generateText, currentProviderId } from '../providers/llmService'
 import type { TimelineCategory, DayGoalPlan, TimelineCardShell } from '../../shared/types'
@@ -130,6 +131,8 @@ export function registerIpcHandlers(broadcast: (channel: string, payload?: unkno
   ipcMain.handle('providers:current', () => currentProviderId())
   ipcMain.handle('providers:testGemini', (_e, apiKey: string) => testGeminiConnection(apiKey))
   ipcMain.handle('providers:testLocal', () => testLocalConnection())
+  ipcMain.handle('providers:testClaudeCli', () => testClaudeCli())
+  ipcMain.handle('providers:claudeCliInstalled', async () => (await resolveClaudeCli()) !== null)
   ipcMain.handle('providers:generateText', (_e, prompt: string, maxTokens?: number) =>
     generateText(prompt, maxTokens)
   )

@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto'
 import * as storage from '../db/storage'
 import { dayWindow, dayInfoFor, formatHMMA } from '../lib/time'
 import { secrets } from '../lib/secrets'
+import { settings } from '../lib/settings'
 
 const MODEL = 'gemini-3.1-flash-lite'
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
@@ -567,16 +568,77 @@ async function runChat(apiKey: string, req: ChatSendRequest, emit: ChatEmit): Pr
 
 // ---------- Registration ----------
 
+// ---------- Claude CLI chat path ----------
+
+/** Compact digest of the last N days' timeline cards for CLI chat context. */
+function buildActivityDigest(days = 7): string {
+  const now = new Date()
+  const sections: string[] = []
+  for (let back = 0; back < days; back++) {
+    const d = new Date(now.getTime())
+    d.setDate(d.getDate() - back)
+    if (d.getHours() < 4) d.setDate(d.getDate() - 1)
+    const pad = (n: number): string => (n < 10 ? `0${n}` : String(n))
+    const day = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+    const cards = storage.fetchTimelineCardsForDay(day)
+    if (cards.length === 0) continue
+    const lines = cards.map(
+      (c) => `- ${c.startTimestamp}-${c.endTimestamp} [${c.category}] ${c.title}: ${c.summary}`
+    )
+    sections.push(`## ${day}\n${lines.join('\n')}`)
+  }
+  let digest = sections.join('\n\n')
+  if (digest.length > 100_000) digest = digest.slice(0, 100_000) + '\n[digest truncated]'
+  return digest || 'No timeline activity recorded yet.'
+}
+
+async function runClaudeCliChat(req: ChatSendRequest, emit: ChatEmit): Promise<string> {
+  const { claudeCliChat } = await import('../providers/claudeCli')
+  const history = Array.isArray(req.history) ? req.history : []
+  const last = history[history.length - 1]
+  if (!last || last.role !== 'user') throw new Error('Nothing to send.')
+  const prior = history.slice(0, -1)
+  const nowStr = new Date().toLocaleString('en-US')
+  const systemContext = `You are Dayflow's assistant. Dayflow is a Windows app that records the user's screen locally and turns it into a timeline of activity cards. Answer questions about the user's activity using the digest below. Be concise, specific, and use markdown. Current date/time: ${nowStr}. Days run 4 AM to 4 AM.
+
+Activity digest (last 7 days):
+
+${buildActivityDigest()}`
+  emit({ type: 'status', stage: 'thinking' })
+  return claudeCliChat(systemContext, prior, last.content)
+}
+
 export function registerChatHandler(broadcast: (channel: string, payload?: unknown) => void): void {
   ipcMain.handle('chat:send', async (_e, req: ChatSendRequest) => {
     const requestId = typeof req?.requestId === 'string' ? req.requestId : null
-    const apiKey = secrets.retrieve('gemini')
-    if (!apiKey || !apiKey.trim()) {
-      return { ok: false, error: 'No Gemini API key configured. Add one in Settings to use Chat.' }
-    }
     const emit: ChatEmit = (payload) => broadcast('chat:event', { requestId, ...payload })
+    const apiKey = secrets.retrieve('gemini')
+    const provider = settings.get<string>('selectedLLMProvider', 'gemini')
+
+    // Claude CLI path: chosen provider, or fallback when no Gemini key exists.
+    if (provider === 'chatgpt_claude' || !apiKey?.trim()) {
+      const { resolveClaudeCli } = await import('../providers/claudeCli')
+      if (await resolveClaudeCli()) {
+        try {
+          const text = await runClaudeCliChat(req ?? {}, emit)
+          return { ok: true, text }
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err)
+          emit({ type: 'error', message })
+          return { ok: false, error: message }
+        }
+      }
+      if (!apiKey?.trim()) {
+        return {
+          ok: false,
+          error:
+            'No chat runtime available. Add a Gemini API key in Settings, or install the Claude CLI and sign in with your Claude subscription.'
+        }
+      }
+    }
+
     try {
-      const text = await runChat(apiKey.trim(), req ?? {}, emit)
+      const text = await runChat(apiKey!.trim(), req ?? {}, emit)
       return { ok: true, text }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)

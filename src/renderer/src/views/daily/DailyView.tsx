@@ -109,6 +109,17 @@ export default function DailyView(): React.JSX.Element {
       none: { isAvailable: true, detail: providerMeta('none').pickerSubtitle }
     }
     try {
+      const hasCli = await api.providers.claudeCliInstalled()
+      map.claude = hasCli
+        ? { isAvailable: true, detail: providerMeta('claude').pickerSubtitle }
+        : {
+            isAvailable: false,
+            detail: 'Install the Claude Code CLI and sign in to use your subscription.'
+          }
+    } catch {
+      /* keep unavailable */
+    }
+    try {
       const hasGemini = await api.secrets.exists('gemini')
       map.gemini = hasGemini
         ? { isAvailable: true, detail: providerMeta('gemini').pickerSubtitle }

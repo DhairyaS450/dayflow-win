@@ -14,6 +14,9 @@ async function onboardingSummary(provider: ProviderChoice | null): Promise<strin
   if (provider === 'gemini') {
     return `Set up Dayflow and connected Google Gemini. ${tail}`
   }
+  if (provider === 'chatgpt_claude') {
+    return `Set up Dayflow with your Claude subscription through the Claude Code CLI. ${tail}`
+  }
   if (provider === 'ollama') {
     const engine = await api.settings.get<string>('llmLocalEngine', 'ollama')
     const engineName =

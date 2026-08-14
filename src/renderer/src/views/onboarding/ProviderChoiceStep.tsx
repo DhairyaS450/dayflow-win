@@ -2,14 +2,13 @@ import { useState } from 'react'
 import { FeatureRow } from './ui'
 import geminiLogo from '../../assets/images/GeminiLogo.png'
 import dayflowLogo from '../../assets/images/DayflowLogo.png'
-import chatgptLogo from '../../assets/images/ChatGPTLogo.svg'
 import claudeLogo from '../../assets/images/ClaudeLogo.png'
 
 // Step: "Choose a way to run Dayflow". Two recommended cards (Gemini + Local)
 // plus a "See all options" 2x2 grid. Dayflow Pro and ChatGPT/Claude are shown
 // but marked "coming later" in the Windows port.
 
-export type ProviderChoice = 'gemini' | 'ollama'
+export type ProviderChoice = 'gemini' | 'ollama' | 'chatgpt_claude'
 
 interface CardDef {
   id: string
@@ -64,16 +63,15 @@ const DAYFLOW_CARD: CardDef = {
 
 const CHATGPT_CARD: CardDef = {
   id: 'chatgpt_claude',
-  title: 'ChatGPT or Claude',
-  badge: 'COMING LATER',
-  badgeTone: 'blue',
+  title: 'Claude',
+  badge: 'USE YOUR SUBSCRIPTION',
+  badgeTone: 'orange',
   pros: [
     'Superior intelligence and reliability',
-    'Uses less than 1% of your daily limit',
-    'Perfect for ChatGPT Plus or Claude Pro paid subscribers'
+    'Uses your existing Claude Pro/Max subscription — no API key',
+    'Uses less than 1% of your daily limit'
   ],
-  caveats: ['Requires installing Codex or Claude CLI'],
-  disabled: true
+  caveats: ['Requires the Claude Code CLI installed and signed in']
 }
 
 function CardIcon(props: { id: string }): React.JSX.Element {
@@ -89,13 +87,8 @@ function CardIcon(props: { id: string }): React.JSX.Element {
   }
   if (props.id === 'chatgpt_claude') {
     return (
-      <span className="ob-provider-icon-pair">
-        <span className="ob-provider-icon">
-          <img src={chatgptLogo} alt="" />
-        </span>
-        <span className="ob-provider-icon">
-          <img src={claudeLogo} alt="" />
-        </span>
+      <span className="ob-provider-icon">
+        <img src={claudeLogo} alt="" />
       </span>
     )
   }
@@ -182,13 +175,17 @@ export default function ProviderChoiceStep(props: {
       <h1 className="ob-serif-heading">Choose a way to run Dayflow</h1>
       {!showAll ? (
         <div className="ob-tall-cards">
-          <TallCard card={GEMINI_CARD} highlighted onSelect={() => props.onSelect('gemini')} />
-          <TallCard card={LOCAL_CARD} onSelect={() => props.onSelect('ollama')} />
+          <TallCard
+            card={CHATGPT_CARD}
+            highlighted
+            onSelect={() => props.onSelect('chatgpt_claude')}
+          />
+          <TallCard card={GEMINI_CARD} onSelect={() => props.onSelect('gemini')} />
         </div>
       ) : (
         <div className="ob-compact-grid">
           <CompactCard card={DAYFLOW_CARD} onSelect={() => undefined} />
-          <CompactCard card={CHATGPT_CARD} onSelect={() => undefined} />
+          <CompactCard card={CHATGPT_CARD} onSelect={() => props.onSelect('chatgpt_claude')} />
           <CompactCard card={GEMINI_CARD} onSelect={() => props.onSelect('gemini')} />
           <CompactCard card={LOCAL_CARD} onSelect={() => props.onSelect('ollama')} />
         </div>

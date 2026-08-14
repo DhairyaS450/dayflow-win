@@ -22,7 +22,7 @@ import {
 // Settings → Providers: current provider, switching, Gemini key + test,
 // local engine config + test, and prompt-override editors.
 
-type ProviderId = 'gemini' | 'ollama'
+type ProviderId = 'gemini' | 'ollama' | 'chatgpt_claude'
 type LocalEngine = 'ollama' | 'lmstudio' | 'custom'
 
 const ENGINE_DEFAULTS: Record<LocalEngine, { baseURL: string; modelId: string }> = {
@@ -120,6 +120,7 @@ export default function ProvidersTab(): React.JSX.Element {
 
   // Local
   const [engine, setEngine] = useState<LocalEngine>('ollama')
+  const [claudeTest, setClaudeTest] = useState<TestState>(IDLE_TEST)
   const [baseUrl, setBaseUrl] = useState('')
   const [modelId, setModelId] = useState('')
   const [localKey, setLocalKey] = useState('')
@@ -143,7 +144,9 @@ export default function ProvidersTab(): React.JSX.Element {
         api.settings.get<GeminiOverrides>('geminiPromptOverrides', {}),
         api.settings.get<OllamaOverrides>('ollamaPromptOverrides', {})
       ])
-      setProvider(current === 'ollama' ? 'ollama' : 'gemini')
+      setProvider(
+        current === 'ollama' ? 'ollama' : current === 'chatgpt_claude' ? 'chatgpt_claude' : 'gemini'
+      )
       setKeyStored(stored)
       setEngine(eng)
       setBaseUrl(base)
@@ -159,6 +162,7 @@ export default function ProvidersTab(): React.JSX.Element {
   const switchProvider = (id: ProviderId): void => {
     setProvider(id)
     void api.settings.set('selectedLLMProvider', id)
+    if (id === 'chatgpt_claude') void api.settings.set('chatCLIPreferredTool', 'claude')
   }
 
   const keyValid = keyInput.trim().startsWith('AIza') && keyInput.trim().length > 30
@@ -257,7 +261,13 @@ export default function ProvidersTab(): React.JSX.Element {
     <div className="st-tab">
       <Section title="Current configuration" subtitle="Active provider and runtime details.">
         <Row label="Primary provider">
-          <span className="st-value">{provider === 'gemini' ? 'Google Gemini' : 'Local AI'}</span>
+          <span className="st-value">
+            {provider === 'gemini'
+              ? 'Google Gemini'
+              : provider === 'chatgpt_claude'
+                ? 'Claude (subscription)'
+                : 'Local AI'}
+          </span>
           <Badge>PRIMARY</Badge>
         </Row>
         <Row
@@ -268,6 +278,7 @@ export default function ProvidersTab(): React.JSX.Element {
           <Segmented<ProviderId>
             options={[
               { value: 'gemini', label: 'Gemini' },
+              { value: 'chatgpt_claude', label: 'Claude' },
               { value: 'ollama', label: 'Local' }
             ]}
             value={provider}
@@ -335,6 +346,39 @@ export default function ProvidersTab(): React.JSX.Element {
               API key should start with &apos;AIza&apos; and be at least 30 characters
             </p>
           )}
+        </div>
+      </Section>
+
+      <Section
+        title="Claude subscription"
+        subtitle="Runs through the Claude Code CLI signed in with your Claude account — no API key stored."
+      >
+        <Row label="How it works" subtitle="Install Claude Code, run `claude` once to sign in, then select Claude as your provider above.">
+          <SecondaryButton
+            label={claudeTest.status === 'testing' ? 'Testing…' : 'Test Claude CLI'}
+            disabled={claudeTest.status === 'testing'}
+            onClick={() =>
+              void (async () => {
+                setClaudeTest({ status: 'testing', message: '' })
+                try {
+                  const res = await api.providers.testClaudeCli()
+                  setClaudeTest(
+                    res.ok
+                      ? { status: 'ok', message: 'Connected — subscription ready.' }
+                      : { status: 'failed', message: res.message || 'Test failed.' }
+                  )
+                } catch (err) {
+                  setClaudeTest({
+                    status: 'failed',
+                    message: err instanceof Error ? err.message : String(err)
+                  })
+                }
+              })()
+            }
+          />
+        </Row>
+        <div className="st-inline-actions">
+          <TestResult state={claudeTest} />
         </div>
       </Section>
 

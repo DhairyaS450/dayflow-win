@@ -10,6 +10,7 @@ import { loadCategories } from '../db/categories'
 import { formatHMMA } from '../lib/time'
 import { GeminiDirectProvider } from './gemini'
 import { OllamaProvider } from './ollama'
+import { ClaudeCliProvider } from './claudeCli'
 import { analysisManager } from '../analysis/analysisManager'
 import {
   isRateLimitError,
@@ -37,6 +38,9 @@ function makeProvider(id: ProviderId): BatchProvider {
     }
     case 'ollama':
       return new OllamaProvider()
+    case 'chatgpt_claude':
+      // Claude Code CLI — authenticated with the user's Claude subscription.
+      return new ClaudeCliProvider()
     default:
       throw new Error('No LLM provider configured. Please configure in settings.')
   }

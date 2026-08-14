@@ -79,6 +79,8 @@ export const api = {
     testGemini: (apiKey: string) =>
       inv<{ ok: boolean; message: string }>('providers:testGemini', apiKey),
     testLocal: () => inv<{ ok: boolean; message: string }>('providers:testLocal'),
+    testClaudeCli: () => inv<{ ok: boolean; message: string }>('providers:testClaudeCli'),
+    claudeCliInstalled: () => inv<boolean>('providers:claudeCliInstalled'),
     generateText: (prompt: string, maxTokens?: number) =>
       inv<string>('providers:generateText', prompt, maxTokens)
   },

@@ -29,6 +29,13 @@ const LOCAL_STEPS: SetupStepDef[] = [
   { id: 'complete', title: 'Complete' }
 ]
 
+const CLAUDE_STEPS: SetupStepDef[] = [
+  { id: 'install', title: 'Install Claude Code' },
+  { id: 'signin', title: 'Sign in' },
+  { id: 'clitest', title: 'Test connection' },
+  { id: 'complete', title: 'Complete' }
+]
+
 const ENGINE_DEFAULTS: Record<LocalEngine, { baseURL: string; modelId: string }> = {
   ollama: { baseURL: 'http://localhost:11434', modelId: 'qwen3-vl:4b' },
   lmstudio: { baseURL: 'http://localhost:1234', modelId: 'Qwen3-VL-4B-Instruct' },
@@ -53,7 +60,8 @@ export default function ProviderSetupStep(props: {
   onComplete: () => void
 }): React.JSX.Element {
   const isGemini = props.provider === 'gemini'
-  const steps = isGemini ? GEMINI_STEPS : LOCAL_STEPS
+  const isClaude = props.provider === 'chatgpt_claude'
+  const steps = isGemini ? GEMINI_STEPS : isClaude ? CLAUDE_STEPS : LOCAL_STEPS
   const [stepIndex, setStepIndex] = useState(0)
 
   // Gemini state
@@ -68,13 +76,17 @@ export default function ProviderSetupStep(props: {
   const [localApiKey, setLocalApiKey] = useState('')
   const [localTest, setLocalTest] = useState<TestState>(IDLE_TEST)
 
+  // Claude CLI state
+  const [claudeTest, setClaudeTest] = useState<TestState>(IDLE_TEST)
+  const [cliInstalled, setCliInstalled] = useState<boolean | null>(null)
+
   const [copied, setCopied] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const step = steps[stepIndex]
   const isLast = stepIndex === steps.length - 1
-  const isTestStep = step.id === 'verify' || step.id === 'test'
-  const testState = isGemini ? gemTest : localTest
+  const isTestStep = step.id === 'verify' || step.id === 'test' || step.id === 'clitest'
+  const testState = isGemini ? gemTest : isClaude ? claudeTest : localTest
   const testPassed = testState.status === 'ok'
 
   const canContinue = ((): boolean => {
@@ -98,6 +110,7 @@ export default function ProviderSetupStep(props: {
     }
     if (to.id === 'verify') setGemTest(IDLE_TEST)
     if (to.id === 'test') setLocalTest(IDLE_TEST)
+    if (to.id === 'clitest') setClaudeTest(IDLE_TEST)
   }
 
   const goTo = (index: number): void => {
@@ -119,6 +132,10 @@ export default function ProviderSetupStep(props: {
         if (isGeminiKeyValid(apiKey)) await api.secrets.store('gemini', apiKey.trim())
         await api.settings.set('selectedLLMProvider', 'gemini')
         await api.settings.set('geminiSetupComplete', true)
+      } else if (isClaude) {
+        await api.settings.set('selectedLLMProvider', 'chatgpt_claude')
+        await api.settings.set('chatCLIPreferredTool', 'claude')
+        await api.settings.set('chatCLISetupComplete', true)
       } else {
         await persistLocalSettings()
         await api.settings.set('selectedLLMProvider', 'ollama')
@@ -170,6 +187,24 @@ export default function ProviderSetupStep(props: {
     } catch (err) {
       setLocalTest({ status: 'failed', message: err instanceof Error ? err.message : String(err) })
     }
+  }
+
+  const runClaudeTest = async (): Promise<void> => {
+    setClaudeTest({ status: 'testing', message: '' })
+    try {
+      const res = await api.providers.testClaudeCli()
+      setClaudeTest(
+        res.ok
+          ? { status: 'ok', message: 'Connected — your Claude subscription is ready.' }
+          : { status: 'failed', message: res.message || 'Test failed.' }
+      )
+    } catch (err) {
+      setClaudeTest({ status: 'failed', message: err instanceof Error ? err.message : String(err) })
+    }
+  }
+
+  const checkCliInstalled = async (): Promise<void> => {
+    setCliInstalled(await api.providers.claudeCliInstalled())
   }
 
   const copyCommand = (): void => {
@@ -308,6 +343,97 @@ export default function ProviderSetupStep(props: {
             <h3 className="ob-setup-heading">All set!</h3>
             <p className="ob-setup-sub">
               Gemini is now configured and ready to use with Dayflow.
+            </p>
+          </div>
+        )
+    }
+  }
+
+  const renderClaudeContent = (): React.JSX.Element => {
+    switch (step.id) {
+      case 'install':
+        return (
+          <div className="ob-setup-block">
+            <h3 className="ob-setup-heading">Install Claude Code</h3>
+            <p className="ob-setup-sub">
+              Dayflow runs on your Claude subscription through the Claude Code CLI. No API key is
+              ever stored — the CLI handles sign-in itself.
+            </p>
+            <ol className="ob-setup-list">
+              <li>
+                Download Claude Code from{' '}
+                <button
+                  className="ob-inline-link"
+                  onClick={() => void api.app.openExternal('https://claude.com/claude-code')}
+                >
+                  claude.com/claude-code
+                </button>{' '}
+                (or run <code>npm install -g @anthropic-ai/claude-code</code>)
+              </li>
+              <li>Restart Dayflow if you just installed it, so it appears on your PATH</li>
+            </ol>
+            <button className="ob-secondary-btn" onClick={() => void checkCliInstalled()}>
+              Check installation
+            </button>
+            {cliInstalled === true && (
+              <div className="ob-status-line good">
+                <span className="ob-status-dot" />
+                Claude CLI detected on this machine.
+              </div>
+            )}
+            {cliInstalled === false && (
+              <div className="ob-status-line bad">
+                <span className="ob-status-dot" />
+                Claude CLI not found. Install it, then check again.
+              </div>
+            )}
+          </div>
+        )
+      case 'signin':
+        return (
+          <div className="ob-setup-block">
+            <h3 className="ob-setup-heading">Sign in with your Claude account</h3>
+            <p className="ob-setup-sub">
+              Open a terminal and run <code>claude</code>, then follow the login prompt in your
+              browser. Sign in with the Claude account that has your Pro or Max subscription. You
+              only need to do this once — Dayflow never sees your credentials.
+            </p>
+            <ol className="ob-setup-list">
+              <li>
+                Open a terminal (press <b>Win + R</b>, type <code>cmd</code>, press Enter)
+              </li>
+              <li>
+                Type <code>claude</code> and press Enter
+              </li>
+              <li>Complete the sign-in in your browser, then close the terminal</li>
+            </ol>
+            <p className="ob-setup-sub">Already signed in? Just continue to the test.</p>
+          </div>
+        )
+      case 'clitest':
+        return (
+          <div className="ob-setup-block">
+            <h3 className="ob-setup-heading">Test your connection</h3>
+            <p className="ob-setup-sub">
+              This sends a tiny test prompt through the Claude CLI using your subscription.
+            </p>
+            <button
+              className="ob-secondary-btn"
+              disabled={claudeTest.status === 'testing'}
+              onClick={() => void runClaudeTest()}
+            >
+              {claudeTest.status === 'testing' ? 'Testing…' : 'Run test'}
+            </button>
+            {testResultLine(claudeTest)}
+          </div>
+        )
+      default:
+        return (
+          <div className="ob-setup-block">
+            <h3 className="ob-setup-heading">You&apos;re all set</h3>
+            <p className="ob-setup-sub">
+              Dayflow will use your Claude subscription to turn recordings into timeline cards.
+              Timeline processing uses well under 1% of a typical daily limit.
             </p>
           </div>
         )
@@ -526,7 +652,9 @@ export default function ProviderSetupStep(props: {
         <button className="ob-back-link" onClick={handleBack}>
           ‹ Back
         </button>
-        <h2 className="ob-setup-title">{isGemini ? 'Gemini' : 'Use local AI'}</h2>
+        <h2 className="ob-setup-title">
+          {isGemini ? 'Gemini' : isClaude ? 'Claude' : 'Use local AI'}
+        </h2>
       </div>
       <div className="ob-setup-body">
         <nav className="ob-setup-sidebar">
@@ -547,7 +675,11 @@ export default function ProviderSetupStep(props: {
           })}
         </nav>
         <div className="ob-setup-content">
-          {isGemini ? renderGeminiContent() : renderLocalContent()}
+          {isGemini
+            ? renderGeminiContent()
+            : isClaude
+              ? renderClaudeContent()
+              : renderLocalContent()}
           <div className="ob-setup-continue-row">
             <button
               className="ob-primary-btn"

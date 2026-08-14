@@ -142,12 +142,13 @@ export default function ChatView(): React.JSX.Element {
   useEffect(() => {
     let cancelled = false
     const load = async (): Promise<void> => {
-      const [batches, accepted, hasKey] = await Promise.all([
+      const [batches, accepted, hasGeminiKey, hasCli] = await Promise.all([
         api.batches.completedCount(),
         api.settings.get<boolean>('chatBetaAccepted', false),
-        api.secrets.exists('gemini')
+        api.secrets.exists('gemini'),
+        api.providers.claudeCliInstalled().catch(() => false)
       ])
-      if (!cancelled) setGate({ batches, accepted, hasKey })
+      if (!cancelled) setGate({ batches, accepted, hasKey: hasGeminiKey || hasCli })
     }
     void load()
     return () => {

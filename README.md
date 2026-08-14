@@ -6,7 +6,8 @@ provider of your choice, and turns your day into a timeline, daily standup, week
 journal you can chat with.
 
 - **Local-first** — recordings and the database stay on your machine
-- **Your AI, your choice** — Gemini API key, or fully local via Ollama / LM Studio
+- **Your AI, your choice** — your Claude subscription (via the Claude Code CLI, no API key),
+  a Gemini API key, or fully local via Ollama / LM Studio
 - **Automatic timeline** — activity cards with categories, summaries, and video review
 - **Daily standup, weekly review, journal, chat** — same features as the Mac app
 
@@ -28,7 +29,9 @@ Known gaps vs the macOS app:
 - Privacy app-blocking list is stored in Settings but not yet enforced at capture time
   (needs foreground-process detection on Windows)
 - Journal view (hidden/access-code-gated upstream) not ported
-- Dayflow Pro backend + ChatGPT/Claude CLI providers not available (shown as "coming later")
+- Dayflow Pro backend + ChatGPT (Codex CLI) providers not available; the Claude CLI provider
+  IS available — install Claude Code, sign in once with your Claude subscription, and pick
+  "Claude" in onboarding or Settings › Providers
 - Timeline review swipe overlay and feedback analytics not wired
 
 ## Development

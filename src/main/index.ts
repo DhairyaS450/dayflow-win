@@ -109,7 +109,11 @@ if (!gotLock) {
     app.setAsDefaultProtocolClient('dayflow')
 
     protocol.handle('dayflow-media', (request) => {
-      const filePath = decodeURIComponent(request.url.replace('dayflow-media://', ''))
+      // URL shape: dayflow-media://local/<encodeURIComponent(absolute path)>
+      const raw = request.url
+        .replace(/^dayflow-media:\/\/local\//, '')
+        .replace(/^dayflow-media:\/\//, '')
+      const filePath = decodeURIComponent(raw)
       return net.fetch(pathToFileURL(filePath).toString())
     })
 

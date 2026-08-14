@@ -139,7 +139,11 @@ export const api = {
     window.dayflow.on(channel, listener)
 }
 
-/** Convert a native file path to the dayflow-media:// URL the renderer can load. */
+/**
+ * Convert a native file path to the dayflow-media:// URL the renderer can load.
+ * The `local` host segment keeps the drive letter out of the URL's authority
+ * position (Chromium would otherwise strip the colon from "C:").
+ */
 export function mediaURL(filePath: string): string {
-  return `dayflow-media://${encodeURIComponent(filePath).replace(/%3A/gi, ':').replace(/%5C/gi, '/').replace(/%2F/gi, '/')}`
+  return `dayflow-media://local/${encodeURIComponent(filePath)}`
 }

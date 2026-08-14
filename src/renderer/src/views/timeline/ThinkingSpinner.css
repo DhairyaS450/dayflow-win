@@ -1,0 +1,29 @@
+.thinking-spinner {
+  display: grid;
+  grid-template-columns: repeat(3, 6px);
+  grid-template-rows: repeat(3, 6px);
+  gap: 2px;
+  transform-origin: center;
+  flex-shrink: 0;
+}
+
+.thinking-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--dim);
+  animation: thinking-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes thinking-pulse {
+  0%,
+  100% {
+    background: var(--dim);
+  }
+  40% {
+    background: var(--hot);
+  }
+  70% {
+    background: var(--mid);
+  }
+}

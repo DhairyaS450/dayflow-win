@@ -1,0 +1,81 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5.25px;
+}
+
+.sidebar-item {
+  width: 61.6px;
+  height: 61.6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: transform 180ms var(--ease-out-quart);
+}
+
+.sidebar-item:hover {
+  transform: scale(1.02);
+}
+
+.sidebar-item:active {
+  transform: scale(0.97);
+}
+
+.sidebar-icon-wrap {
+  position: relative;
+  width: 37.4px;
+  height: 37.4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-icon-bg {
+  position: absolute;
+  width: 33px;
+  height: 33px;
+  inset: 0;
+  margin: auto;
+}
+
+.sidebar-icon {
+  position: relative;
+  width: 17.6px;
+  height: 17.6px;
+  object-fit: contain;
+}
+
+/* Tint via filters: brand orange when selected, warm brown otherwise */
+.sidebar-icon.tint-unselected {
+  filter: brightness(0) saturate(100%) invert(44%) sepia(22%) saturate(742%) hue-rotate(336deg)
+    brightness(92%) contrast(88%);
+}
+
+.sidebar-icon.tint-selected {
+  filter: brightness(0) saturate(100%) invert(48%) sepia(66%) saturate(3462%) hue-rotate(1deg)
+    brightness(101%) contrast(97%);
+}
+
+.sidebar-glyph {
+  position: relative;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--df-sidebar-unselected);
+}
+
+.sidebar-glyph.selected {
+  color: var(--df-orange);
+}
+
+.sidebar-label {
+  font-family: var(--font-body);
+  font-size: 12.1px;
+  color: var(--df-sidebar-unselected);
+}
+
+.sidebar-label.selected {
+  color: var(--df-orange);
+}

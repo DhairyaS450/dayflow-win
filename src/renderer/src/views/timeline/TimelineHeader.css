@@ -1,0 +1,260 @@
+.tl-header {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  position: relative;
+  z-index: 20;
+}
+
+.tl-header-leading {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  margin-left: -10px;
+}
+
+.tl-nav-arrow {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.tl-nav-arrow:hover:not(:disabled) {
+  background: var(--df-nav-hover);
+}
+
+.tl-nav-arrow:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.tl-cal-anchor {
+  position: relative;
+}
+
+.tl-cal-pill {
+  width: 36px;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--df-cal-pill);
+  border: 1px solid var(--df-pill-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.tl-cal-pill.open {
+  background: var(--df-cal-pill-open);
+  border-color: var(--df-pill-border-open);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tl-cal-catcher {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+}
+
+.tl-cal-popover {
+  position: absolute;
+  top: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 338px;
+  padding: 20px 28px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  border-radius: 8px;
+  border: 1px solid var(--df-cal-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+  z-index: 31;
+  animation: cal-open 180ms ease-out;
+}
+
+@keyframes cal-open {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.tl-cal-month-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
+  margin-bottom: 12px;
+}
+
+.tl-cal-month {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.tl-cal-chevrons button {
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--df-cal-chevron);
+}
+
+.tl-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 30px);
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tl-cal-weekdays span {
+  font-family: var(--font-display);
+  font-size: 12px;
+  text-align: center;
+}
+
+.tl-cal-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tl-cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, 30px);
+  gap: 12px;
+  height: 30px;
+  align-items: center;
+  border-radius: 15px;
+}
+
+.tl-cal-week.selected {
+  background: var(--df-orange-cal-selected);
+}
+
+.tl-cal-day {
+  width: 30px;
+  height: 24px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 12px;
+}
+
+.tl-cal-day.dim {
+  color: var(--df-cal-disabled);
+}
+
+.tl-cal-day.selected {
+  background: var(--df-orange-cal-selected);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.tl-cal-day.in-week {
+  color: white;
+}
+
+.tl-cal-day.in-week.dim {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.tl-mode-toggle {
+  position: relative;
+  width: 104px;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--df-pill-bg);
+  border: 1px solid var(--df-pill-border);
+  display: flex;
+}
+
+.tl-mode-highlight {
+  position: absolute;
+  top: 0;
+  width: 52px;
+  height: 28px;
+  border-radius: 14px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 177, 141, 0.6),
+    #ffa46f,
+    #ffb18d
+  );
+  box-shadow: 0 1px 4px rgba(232, 154, 108, 0.18);
+  transition: left 260ms var(--ease-out-quart);
+}
+
+.tl-mode-highlight.day {
+  left: 0;
+}
+
+.tl-mode-highlight.week {
+  left: 50%;
+}
+
+.tl-mode-segment {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--df-toggle-unselected);
+  z-index: 1;
+}
+
+.tl-mode-segment.selected {
+  color: white;
+}
+
+.tl-today-btn {
+  width: 56px;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--df-pill-bg);
+  border: 1px solid var(--df-pill-border);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--df-toggle-unselected);
+  animation: today-in 160ms ease-out;
+}
+
+@keyframes today-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tl-date-label {
+  font-family: var(--font-display);
+  font-size: 26px;
+  margin-left: 10px;
+  white-space: nowrap;
+  color: #000;
+}
+
+.tl-header-trailing {
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}

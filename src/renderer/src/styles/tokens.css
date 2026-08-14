@@ -1,0 +1,72 @@
+/* Dayflow design tokens — extracted from the macOS app (MIT). */
+
+:root {
+  /* Brand oranges */
+  --df-orange: #f96e00;
+  --df-orange-cal-selected: #fc7103;
+  --df-orange-accent: #ff8046;
+  --df-orange-button: #ff6b05;
+  --df-orange-retry: #ff8a2b;
+  --df-orange-ring: #ff8d40;
+  --df-orange-link: #ff6600;
+  --df-orange-part-label: #fa6e00;
+  --df-orange-pause-text: #f3854b;
+
+  /* Header / pill chrome */
+  --df-cal-pill: #ffa777;
+  --df-cal-pill-open: #ffb38e;
+  --df-pill-border: #f2d2bd;
+  --df-pill-border-open: #e8bda1;
+  --df-pill-bg: #ffefe4;
+  --df-nav-hover: rgba(255, 235, 211, 0.79);
+  --df-toggle-unselected: #796e64;
+  --df-hour-label: #594838;
+  --df-footer-text: #d6a685;
+  --df-copy-bg: #fcede0;
+  --df-copy-stroke: #f7e3cf;
+  --df-fade-end: #fff8f1;
+
+  /* Cards & neutrals */
+  --df-card-bg: #fffbf8;
+  --df-card-failed-bg: #ffece4;
+  --df-failed-red: #ff291c;
+  --df-card-border: #e8e8e8;
+  --df-divider: #ececec;
+  --df-text-dark: #333333;
+  --df-text-mid: #666666;
+  --df-text-section: #8c8c8c;
+  --df-text-retry-status: #808080;
+  --df-failed-status: #8c7366;
+  --df-failed-status-week: #7a6254;
+  --df-time-pill-bg: rgba(245, 240, 232, 0.9);
+  --df-time-pill-border: #e5e5e5;
+  --df-chip-border: #e0e0e0;
+  --df-rate-footer-bg: #fafafa;
+  --df-rate-footer-stroke: #ededed;
+  --df-rate-text: rgba(125, 120, 117, 0.95);
+  --df-delete-text: rgba(192, 92, 84, 0.9);
+  --df-delete-confirm-bg: #df6055;
+  --df-delete-confirm-stroke: #cb4e43;
+  --df-sidebar-unselected: #99664d;
+  --df-helper-text: #635953;
+  --df-cal-chevron: #a8a09a;
+  --df-cal-disabled: #c1b5ac;
+  --df-cal-border: #e9dad1;
+  --df-paused-gray: #888d95;
+  --df-cream-scrim: rgba(250, 245, 237, 0.4);
+  --df-toast-action-bg: #402b00;
+  --df-toast-warning: #c04a00;
+  --df-toast-bg: #fff8f2;
+  --df-toast-border: #f3d9c2;
+  --df-error-red: #c22933;
+
+  /* Fonts */
+  --font-body: 'Figtree', 'Segoe UI', sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+
+  /* Motion */
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+  /* Category fallback */
+  --df-category-fallback: #4f80eb;
+}

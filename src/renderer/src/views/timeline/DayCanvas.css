@@ -1,0 +1,215 @@
+.day-canvas-scroll {
+  flex: 1;
+  overflow-y: auto;
+  opacity: 0;
+}
+
+.day-canvas-scroll.revealed {
+  opacity: 1;
+  transition: opacity 180ms ease-out;
+}
+
+.day-canvas {
+  position: relative;
+}
+
+.day-hour-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 168px;
+  pointer-events: none;
+}
+
+.day-hour-label {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 60px;
+  padding-right: 5px;
+  padding-top: 2px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--df-hour-label);
+  pointer-events: auto;
+  cursor: default;
+}
+
+.day-hour-line {
+  position: absolute;
+  top: 0;
+  left: 60px;
+  right: 0;
+  height: 0.75px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.day-card-area {
+  position: absolute;
+  left: 60px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.day-card {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  background: var(--df-card-bg);
+  border-radius: 2px;
+  border: 0.25px solid var(--df-card-border);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    transform 180ms var(--ease-out-quart),
+    box-shadow 180ms var(--ease-out-quart);
+  animation: day-card-in 350ms var(--ease-out-quart) backwards;
+}
+
+@keyframes day-card-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.day-card:hover {
+  transform: scale(1.005);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 1px 1px rgba(0, 0, 0, 0.08),
+    0 2px 2px rgba(0, 0, 0, 0.06);
+  z-index: 5;
+}
+
+.day-card:active {
+  transform: scale(0.992);
+}
+
+.day-card.selected {
+  z-index: 6;
+}
+
+.day-card.failed {
+  background: var(--df-card-failed-bg);
+  border: 0.5px dashed var(--df-failed-red);
+}
+
+.day-card-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  border-radius: 2px 0 0 2px;
+}
+
+.day-card-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 16px;
+  height: 100%;
+  align-items: flex-start;
+}
+
+.day-card.compact .day-card-content {
+  padding-top: 0;
+  padding-bottom: 0;
+  align-items: center;
+}
+
+.day-card-title {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.day-card-spacer {
+  flex: 1;
+}
+
+.day-card-time {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+}
+
+.day-card-backup {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(245, 240, 232, 0.9);
+  border: 0.75px solid #e5e5e5;
+  font-size: 9px;
+  font-weight: 600;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.day-card-failed-status {
+  padding: 0 16px 6px;
+  font-size: 13px;
+  color: var(--df-failed-status);
+}
+
+.day-status-card {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  overflow: hidden;
+}
+
+.day-status-card.active {
+  background:
+    linear-gradient(
+      to right,
+      rgba(94, 127, 192, 0.7),
+      rgba(216, 142, 206, 0.7) 35%,
+      rgba(255, 193, 158, 0.7) 68%,
+      rgba(255, 237, 224, 0.7)
+    ),
+    #d9c6ba;
+  border: 0.75px solid rgba(255, 255, 255, 0.52);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.day-status-card.inactive {
+  background: linear-gradient(to right, #f7e6d5 13%, #dadee4);
+  border: 1px solid white;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+}
+
+.day-status-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.day-status-text.paused {
+  font-weight: 400;
+  color: var(--df-paused-gray);
+}
+
+.day-status-icon {
+  font-size: 11px;
+  color: var(--df-paused-gray);
+}

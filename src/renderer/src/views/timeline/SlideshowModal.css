@@ -1,0 +1,141 @@
+.ssm-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scrim-in 250ms ease-out;
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ssm-modal {
+  width: 90%;
+  height: 90%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ssm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+.ssm-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.ssm-subtitle {
+  font-size: 12px;
+  color: var(--df-text-mid);
+}
+
+.ssm-close {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 16px;
+}
+
+.ssm-stage {
+  flex: 1;
+  position: relative;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  cursor: pointer;
+}
+
+.ssm-frame,
+.ssm-video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.ssm-video {
+  width: 100%;
+  height: 100%;
+}
+
+.ssm-play-overlay {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  color: white;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ssm-speed-chip {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ssm-error,
+.ssm-loading {
+  color: white;
+  font-size: 13px;
+}
+
+.ssm-error {
+  color: var(--df-error-red);
+}
+
+.ssm-scrubber {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 30px;
+  background: white;
+}
+
+.ssm-scrubber input {
+  flex: 1;
+  accent-color: var(--df-orange);
+}
+
+.ssm-time-chip {
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-variant-numeric: tabular-nums;
+}

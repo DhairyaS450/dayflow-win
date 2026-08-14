@@ -1,0 +1,75 @@
+.filter-bar {
+  display: flex;
+  align-items: center;
+  height: 26px;
+  padding-left: 65px;
+  position: relative;
+  gap: 8px;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-left: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 26px;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.76);
+  border-radius: 6px;
+  border: 0.5px solid var(--df-chip-border);
+  flex-shrink: 0;
+}
+
+.filter-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.filter-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--df-text-dark);
+  white-space: nowrap;
+}
+
+.filter-fade {
+  position: absolute;
+  right: 32px;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, transparent, var(--df-fade-end));
+  pointer-events: none;
+}
+
+.filter-edit-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--df-pill-bg);
+  border: 1px solid var(--df-pill-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.filter-edit-btn img {
+  width: 48%;
+  height: 48%;
+  object-fit: contain;
+}

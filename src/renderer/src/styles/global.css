@@ -1,3 +1,6 @@
+@import './fonts.css';
+@import './tokens.css';
+
 * {
   margin: 0;
   padding: 0;
@@ -13,6 +16,49 @@ body,
 }
 
 body {
-  background: #faf9f6;
+  background: #faf5ed;
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  color: #000;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Frameless window drag region along the top */
+.titlebar-drag {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 140px;
+  height: 24px;
+  -webkit-app-region: drag;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.selectable {
+  user-select: text;
 }

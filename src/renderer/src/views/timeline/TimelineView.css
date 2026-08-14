@@ -1,0 +1,78 @@
+.tl-root {
+  display: flex;
+  height: 100%;
+}
+
+.tl-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 5px 15px 15px;
+  gap: 18px;
+  position: relative;
+}
+
+.tl-left > .filter-bar {
+  margin-top: -10px;
+}
+
+.tl-divider {
+  width: 1px;
+  background: var(--df-divider);
+  margin: 15px 0;
+}
+
+.tl-inspector {
+  flex-shrink: 0;
+  padding: 15px 15px 15px 0;
+}
+
+.tl-inspector > * {
+  height: 100%;
+}
+
+.tl-footer {
+  position: absolute;
+  bottom: 17px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.tl-footer-hours {
+  font-size: 10px;
+  color: var(--df-footer-text);
+}
+
+.tl-footer-flex {
+  flex: 1;
+}
+
+.tl-copy-btn {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 104px;
+  height: 23px;
+  justify-content: center;
+  border-radius: 7px;
+  background: var(--df-copy-bg);
+  border: 0.5px solid var(--df-copy-stroke);
+  color: var(--df-footer-text);
+  font-size: 11.5px;
+  font-weight: 500;
+  transition: transform 150ms ease;
+}
+
+.tl-copy-btn:hover {
+  transform: scale(1.02);
+}
+
+.tl-copy-btn:active {
+  transform: scale(0.97);
+}

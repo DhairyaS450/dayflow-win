@@ -1,0 +1,470 @@
+/* Day goal header + day summary metrics — spec §4.3, §4.4. */
+
+.gs-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.gs-row {
+  display: flex;
+  gap: 22px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+/* --- Goal header (360-wide panel) --- */
+
+.gs-header {
+  flex: 0 0 360px;
+  width: 360px;
+  background: #fffdfb;
+  border: 1.1px solid #ede5e1;
+  border-radius: 4px;
+  padding: 16px 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gs-header[data-disabled='yes'] {
+  background: #fcf9f6;
+  border-color: #d8d8d8;
+}
+
+.gs-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gs-header-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  color: #333333;
+}
+
+.gs-setgoals {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 12px;
+  color: #ffffff;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 177, 141, 0.6),
+    #ffb18d 35%,
+    #ffa46f 70%,
+    #ffb18d
+  );
+  border: 1.25px solid #f2d2bd;
+  box-shadow:
+    -3px 0 4px rgba(255, 255, 255, 0.5),
+    3px 0 4px rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: transform 0.14s ease-out;
+}
+
+.gs-setgoals:hover {
+  transform: scale(1.02);
+}
+
+.gs-setgoals:active {
+  transform: scale(0.97);
+}
+
+.gs-status {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: #707070;
+}
+
+.gs-metric-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.gs-bubble {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e7e7e7;
+  border: 2px solid #fcf9f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.gs-bubble-disabled img {
+  filter: grayscale(1) opacity(0.55);
+}
+
+.gs-bar-block {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.gs-row-labels {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.gs-row-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: #787878;
+}
+
+.gs-row-metric {
+  font-family: var(--font-body);
+  font-size: 11px;
+}
+
+.gs-value-focus {
+  color: #628cff;
+}
+
+.gs-value-distraction {
+  color: #fc675f;
+}
+
+.gs-value-prominent-focus {
+  font-family: 'Nunito', var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  background: linear-gradient(to bottom, #5b87ff, #003ee9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gs-value-prominent-distraction {
+  font-family: 'Nunito', var(--font-body);
+  font-weight: 700;
+  font-size: 16px;
+  background: linear-gradient(to bottom, #ff8c85, #fc675f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gs-suffix {
+  color: #787878;
+}
+
+.gs-focus-track {
+  height: 14px;
+  border-radius: 2px;
+  background: #e7e7e7;
+  display: flex;
+  align-items: center;
+  gap: 2.55px;
+  padding: 3px 3px 3px 3px;
+}
+
+.gs-focus-track[data-fulfilled='yes'] {
+  background: #ececec;
+  box-shadow:
+    0 0 3px rgba(98, 140, 255, 0.5),
+    inset 0 0 0 0.5px rgba(145, 174, 255, 0.9);
+}
+
+.gs-focus-segment {
+  height: 8px;
+  border-radius: 9999px;
+  min-width: 4px;
+}
+
+.gs-distraction-track {
+  position: relative;
+  height: 14px;
+  border-radius: 2px;
+  background: #e7e7e7;
+  overflow: hidden;
+}
+
+.gs-distraction-fill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  right: 3px;
+  border-radius: 6px;
+  background: #fa8282;
+}
+
+.gs-mock-track {
+  height: 12px;
+  border-radius: 2px;
+  background: #e7e7e7;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.gs-mock-fill {
+  height: 6px;
+  width: 96%;
+  border-radius: 9999px;
+  background: #f6f6f6;
+}
+
+.gs-tail {
+  height: 14px;
+  background: rgba(217, 217, 217, 0.72);
+  clip-path: polygon(0 0, 100% 0, 88% 100%, 6px 100%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 13px;
+  overflow: hidden;
+}
+
+.gs-tail-mirrored {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 12% 100%);
+}
+
+.gs-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 8px;
+  color: #333333;
+  white-space: nowrap;
+}
+
+.gs-legend-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+
+.gs-distraction-row .gs-bubble {
+  margin-top: 12px;
+}
+
+/* --- Day summary panels --- */
+
+.gs-panel {
+  flex: 1 1 300px;
+  min-width: 280px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1.1px solid #e8e1da;
+  border-radius: 4px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gs-panel-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  color: #333333;
+  margin: 0;
+}
+
+.gs-panel-title-distraction {
+  font-size: 22px;
+  margin-top: 8px;
+}
+
+.gs-daysofar {
+  align-items: center;
+}
+
+.gs-daysofar .gs-panel-title {
+  align-self: flex-start;
+}
+
+.gs-donut {
+  display: block;
+}
+
+.gs-donut-base {
+  filter: drop-shadow(0 0 5px rgba(99, 71, 56, 0.35));
+}
+
+.gs-donut-total-label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 8px;
+  fill: #a5a5a5;
+  letter-spacing: 0.5px;
+}
+
+.gs-donut-value {
+  font-family: var(--font-display);
+  font-size: 16px;
+  fill: #333333;
+}
+
+.gs-donut-empty {
+  position: relative;
+  width: 205px;
+  height: 205px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gs-donut-empty svg {
+  position: absolute;
+  inset: 0;
+}
+
+.gs-donut-empty-text {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: rgba(128, 128, 128, 0.6);
+  z-index: 1;
+}
+
+.gs-legend-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 84.667px);
+  gap: 14px;
+  width: 100%;
+  justify-content: center;
+}
+
+.gs-legend-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gs-legend-name-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.gs-swatch {
+  flex: 0 0 auto;
+  width: 10.667px;
+  height: 8px;
+  border-radius: 3px;
+  border: 1.25px solid;
+}
+
+.gs-legend-name {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: #636363;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gs-legend-duration {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 12px;
+  color: #333333;
+  padding-left: 14px;
+}
+
+.gs-empty-note {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: #707070;
+}
+
+.gs-focus-total-card {
+  background: #f7f7f7;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gs-focus-total-card[data-dim='yes'],
+.gs-distraction-card[data-dim='yes'] {
+  opacity: 0.45;
+}
+
+.gs-focus-total-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: #333333;
+}
+
+.gs-focus-total-value {
+  font-family: var(--font-display);
+  font-size: 34px;
+  color: #f3854b;
+}
+
+.gs-distraction-card {
+  display: flex;
+  align-items: center;
+  gap: 27px;
+  background: #f7f7f7;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.gs-bubble-chart {
+  position: relative;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: rgba(240, 240, 240, 0.8);
+  border: 1px solid #dddddd;
+  overflow: hidden;
+}
+
+.gs-bubble-inner {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, #ffe3de, #ff694b 78.3%);
+}
+
+.gs-distraction-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 130px;
+}
+
+.gs-distraction-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gs-stat-label {
+  font-family: var(--font-display);
+  font-size: 14px;
+}
+
+.gs-stat-value {
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+.gs-stat-captured .gs-stat-label,
+.gs-stat-captured .gs-stat-value {
+  color: #9c9c9c;
+}
+
+.gs-stat-distracted .gs-stat-label,
+.gs-stat-distracted .gs-stat-value {
+  color: #ff694b;
+}

@@ -1,4 +1,5 @@
 import { ipcMain, shell, app, clipboard } from 'electron'
+import { registerChatHandler } from './chatHandler'
 import * as storage from '../db/storage'
 import { loadCategories, saveCategories } from '../db/categories'
 import { settings } from '../lib/settings'
@@ -15,6 +16,7 @@ import type { TimelineCategory, DayGoalPlan, TimelineCardShell } from '../../sha
 // One flat invoke-based API. Renderer calls window.dayflow.invoke(channel, ...).
 
 export function registerIpcHandlers(broadcast: (channel: string, payload?: unknown) => void): void {
+  registerChatHandler(broadcast)
   // ----- Timeline -----
   ipcMain.handle('timeline:cardsForDay', (_e, day: string) => storage.fetchTimelineCardsForDay(day))
   ipcMain.handle('timeline:cardsByRange', (_e, fromTs: number, toTs: number) =>

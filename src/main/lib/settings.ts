@@ -70,6 +70,6 @@ export const SettingsKeys = {
   idleResetMinutes: 'idleResetMinutes',
   privacyBlockedApps: 'recordingPrivacyBlockedApplicationIdentifiers',
   privacyDidSeedDefaults: 'recordingPrivacyDidSeedDefaultSecretApps',
-  saveTimelapses: 'saveTimelapsesToDisk',
+  saveTimelapses: 'saveAllTimelapsesToDisk',
   launchAtLogin: 'launchAtLogin'
 } as const

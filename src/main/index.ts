@@ -9,7 +9,8 @@ import { appState } from './app/appState'
 import { screenRecorder } from './recording/recorder'
 import { pauseManager } from './recording/pauseManager'
 import { analysisManager } from './analysis/analysisManager'
-import { registerLLMService } from './providers/llmService'
+import { registerLLMService, generateText } from './providers/llmService'
+import { startRecapScheduler } from './analysis/recapScheduler'
 import { registerIpcHandlers } from './ipc/handlers'
 import { createTray } from './app/tray'
 
@@ -149,6 +150,7 @@ if (!gotLock) {
 
     // Analysis job starts 2 s after launch.
     setTimeout(() => analysisManager.start(), 2000)
+    startRecapScheduler(generateText)
 
     const startupLink = process.argv.find((a) => a.toLowerCase().startsWith('dayflow://'))
     if (startupLink) handleDeepLink(startupLink)

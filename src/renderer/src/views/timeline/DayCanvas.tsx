@@ -12,6 +12,7 @@ import {
 } from './layout'
 import { api } from '../../lib/api'
 import ThinkingSpinner from './ThinkingSpinner'
+import Favicon from '../../components/Favicon'
 import './DayCanvas.css'
 
 export default function DayCanvas(): React.JSX.Element {
@@ -113,6 +114,12 @@ export default function DayCanvas(): React.JSX.Element {
                 {!failed && <div className="day-card-accent" style={{ background: accent }} />}
                 {durationMin >= 10 && (
                   <div className="day-card-content">
+                    {!failed && (
+                      <Favicon
+                        domain={p.card.appSites?.primary ?? p.card.appSites?.secondary}
+                        size={18}
+                      />
+                    )}
                     <span className="day-card-title">{p.card.title}</span>
                     <span className="day-card-spacer" />
                     {p.card.isBackupGenerated && (

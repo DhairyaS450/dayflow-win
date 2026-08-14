@@ -1,0 +1,75 @@
+/* Daily view layout — spec §2.3 (scale s = 1.1 pre-multiplied). */
+
+.daily-root {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.daily-content {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 22px 17.6px 17.6px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  animation: daily-fade-in 0.3s ease-out;
+}
+
+@keyframes daily-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.daily-topcontrols {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8.8px;
+}
+
+.daily-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28.6px;
+  color: #1e1b18;
+  width: 340px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.daily-nav {
+  width: 33px;
+  height: 33px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.12s ease-out,
+    transform 0.12s ease-out;
+}
+
+.daily-nav:hover:not(:disabled) {
+  background: rgba(255, 235, 211, 0.79);
+}
+
+.daily-nav:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.daily-nav:disabled {
+  cursor: default;
+}
+
+.daily-nav:disabled img {
+  opacity: 0.35;
+}

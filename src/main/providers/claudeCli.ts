@@ -5,6 +5,9 @@
 
 import { spawn, execFile } from 'child_process'
 import { EventEmitter } from 'events'
+import { writeFileSync } from 'fs'
+import { join } from 'path'
+import { tmpdir } from 'os'
 import { insertLLMCall } from '../db/storage'
 import { formatHMMA } from '../lib/time'
 import { cardGenerationPrompt } from './prompts'
@@ -93,6 +96,11 @@ export async function checkClaudeAuth(): Promise<ClaudeAuthState> {
  * Open an interactive terminal running `claude auth login` so the user can
  * complete the OAuth flow. The CLI stores its own credentials; Dayflow never
  * sees them.
+ *
+ * The command is written to a temporary .cmd script rather than passed as
+ * arguments: Windows argument escaping mangles quoted strings (a quoted window
+ * title was being split into separate commands), and the CLI path can contain
+ * spaces. `detached` gives the script its own console window.
  */
 export async function openClaudeLogin(): Promise<{ ok: boolean; message: string }> {
   const cliPath = await resolveClaudeCli()
@@ -103,11 +111,22 @@ export async function openClaudeLogin(): Promise<{ ok: boolean; message: string 
     }
   }
   try {
-    // `start` opens a real console window; /k keeps it open after login finishes.
-    spawn('cmd.exe', ['/c', 'start', '"Sign in to Claude"', 'cmd', '/k', `"${cliPath}" auth login`], {
-      windowsHide: false,
+    const script = [
+      '@echo off',
+      'title Sign in to Claude',
+      'echo Signing in to Claude for Dayflow...',
+      'echo.',
+      `"${cliPath}" auth login`,
+      'echo.',
+      'echo Finished. Close this window, then press Retry in Dayflow.',
+      'pause'
+    ].join('\r\n')
+    const scriptPath = join(tmpdir(), `dayflow-claude-login-${Date.now()}.cmd`)
+    writeFileSync(scriptPath, script, 'utf-8')
+    spawn('cmd.exe', ['/c', scriptPath], {
       detached: true,
-      stdio: 'ignore'
+      stdio: 'ignore',
+      windowsHide: false
     }).unref()
     return {
       ok: true,
@@ -117,8 +136,6 @@ export async function openClaudeLogin(): Promise<{ ok: boolean; message: string 
     return { ok: false, message: err instanceof Error ? err.message : String(err) }
   }
 }
-
-
 
 let cachedCliPath: string | null | undefined
 

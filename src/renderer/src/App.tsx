@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useStore } from './state/store'
 import Sidebar from './components/Sidebar'
+import ClaudeAuthBanner from './components/ClaudeAuthBanner'
 import TimelineView from './views/timeline/TimelineView'
 import DailyView from './views/daily/DailyView'
 import WeeklyView from './views/weekly/WeeklyView'
@@ -50,6 +51,7 @@ export default function App(): React.JSX.Element {
   return (
     <div className="app-root">
       <div className="titlebar-drag" />
+      <ClaudeAuthBanner />
       <img className="app-wallpaper" src={mainBackground} alt="" />
       <div className="app-scrim" />
       <div className="app-layout">

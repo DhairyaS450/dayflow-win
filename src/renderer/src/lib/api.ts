@@ -81,6 +81,11 @@ export const api = {
     testLocal: () => inv<{ ok: boolean; message: string }>('providers:testLocal'),
     testClaudeCli: () => inv<{ ok: boolean; message: string }>('providers:testClaudeCli'),
     claudeCliInstalled: () => inv<boolean>('providers:claudeCliInstalled'),
+    claudeAuth: () =>
+      inv<{ installed: boolean; loggedIn: boolean; authMethod: string | null }>(
+        'providers:claudeAuth'
+      ),
+    claudeLogin: () => inv<{ ok: boolean; message: string }>('providers:claudeLogin'),
     generateText: (prompt: string, maxTokens?: number) =>
       inv<string>('providers:generateText', prompt, maxTokens)
   },
@@ -135,6 +140,7 @@ export const api = {
     createCard: (categoryName: string, summary: string) =>
       inv<void>('onboarding:createCard', categoryName, summary)
   },
+  analysisTriggerNow: () => inv<void>('analysis:triggerNow'),
   on: (channel: string, listener: (...args: unknown[]) => void): (() => void) =>
     window.dayflow.on(channel, listener)
 }

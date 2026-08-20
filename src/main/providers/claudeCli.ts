@@ -4,6 +4,7 @@
 // Parity with upstream Dayflow's ChatGPT/Claude CLI provider.
 
 import { spawn, execFile } from 'child_process'
+import { EventEmitter } from 'events'
 import { insertLLMCall } from '../db/storage'
 import { formatHMMA } from '../lib/time'
 import { cardGenerationPrompt } from './prompts'
@@ -20,6 +21,104 @@ import { randomUUID } from 'crypto'
 
 const CLI_TIMEOUT_MS = 5 * 60 * 1000
 const MAX_TRANSCRIBE_IMAGES = 12
+export const AUTH_ERROR_CODE = 3
+
+/** Emits 'authRequired' when the CLI reports an expired/missing login. */
+export const claudeEvents = new EventEmitter()
+
+let authRequired = false
+
+/** True when the CLI's own output indicates the user must sign in again. */
+export function isAuthFailure(text: string): boolean {
+  const lower = (text || '').toLowerCase()
+  return (
+    lower.includes('authenticate') ||
+    lower.includes('authentication') ||
+    lower.includes('oauth') ||
+    lower.includes('session expired') ||
+    lower.includes('not logged in') ||
+    lower.includes('please log in') ||
+    lower.includes('please sign in') ||
+    lower.includes('unauthorized') ||
+    lower.includes('invalid api key') ||
+    lower.includes('credentials')
+  )
+}
+
+export function isClaudeAuthRequired(): boolean {
+  return authRequired
+}
+
+export interface ClaudeAuthState {
+  installed: boolean
+  loggedIn: boolean
+  authMethod: string | null
+}
+
+/** Ask the CLI itself whether it is signed in (`claude auth status`, no token cost). */
+export async function checkClaudeAuth(): Promise<ClaudeAuthState> {
+  const cliPath = await resolveClaudeCli()
+  if (!cliPath) return { installed: false, loggedIn: false, authMethod: null }
+  return new Promise((resolve) => {
+    execFile(
+      cliPath,
+      ['auth', 'status'],
+      { windowsHide: true, timeout: 30_000 },
+      (err, stdout) => {
+        if (err && !stdout) {
+          resolve({ installed: true, loggedIn: false, authMethod: null })
+          return
+        }
+        try {
+          const parsed = JSON.parse(stdout.trim()) as {
+            loggedIn?: boolean
+            authMethod?: string
+          }
+          const loggedIn = parsed.loggedIn === true
+          authRequired = !loggedIn
+          resolve({
+            installed: true,
+            loggedIn,
+            authMethod: parsed.authMethod ?? null
+          })
+        } catch {
+          resolve({ installed: true, loggedIn: false, authMethod: null })
+        }
+      }
+    )
+  })
+}
+
+/**
+ * Open an interactive terminal running `claude auth login` so the user can
+ * complete the OAuth flow. The CLI stores its own credentials; Dayflow never
+ * sees them.
+ */
+export async function openClaudeLogin(): Promise<{ ok: boolean; message: string }> {
+  const cliPath = await resolveClaudeCli()
+  if (!cliPath) {
+    return {
+      ok: false,
+      message: 'Claude CLI not found on PATH. Install Claude Code, then try again.'
+    }
+  }
+  try {
+    // `start` opens a real console window; /k keeps it open after login finishes.
+    spawn('cmd.exe', ['/c', 'start', '"Sign in to Claude"', 'cmd', '/k', `"${cliPath}" auth login`], {
+      windowsHide: false,
+      detached: true,
+      stdio: 'ignore'
+    }).unref()
+    return {
+      ok: true,
+      message: 'A terminal window opened. Finish signing in there, then press Retry.'
+    }
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : String(err) }
+  }
+}
+
+
 
 let cachedCliPath: string | null | undefined
 
@@ -134,17 +233,13 @@ async function runClaude(
   })
 
   if (isError) {
-    const lower = resultText.toLowerCase()
-    if (
-      lower.includes('login') ||
-      lower.includes('authentication') ||
-      lower.includes('not authenticated') ||
-      lower.includes('api key')
-    ) {
+    if (isAuthFailure(resultText)) {
+      authRequired = true
+      claudeEvents.emit('authRequired')
       throw new ProviderError(
-        'Claude CLI is not signed in. Open a terminal, run "claude", and log in with your Claude account, then retry.',
+        'Your Claude sign-in has expired. Sign in again to keep generating timeline cards.',
         'ClaudeCLI',
-        3
+        AUTH_ERROR_CODE
       )
     }
     throw new ProviderError(
@@ -153,6 +248,7 @@ async function runClaude(
       4
     )
   }
+  authRequired = false
   return resultText
 }
 

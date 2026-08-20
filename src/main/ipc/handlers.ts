@@ -9,7 +9,13 @@ import { appState } from '../app/appState'
 import { pauseManager, type PauseDuration } from '../recording/pauseManager'
 import { testGeminiConnection } from '../providers/gemini'
 import { testLocalConnection } from '../providers/ollama'
-import { testClaudeCli, resolveClaudeCli } from '../providers/claudeCli'
+import {
+  testClaudeCli,
+  resolveClaudeCli,
+  checkClaudeAuth,
+  openClaudeLogin,
+  claudeEvents
+} from '../providers/claudeCli'
 import { currentUsage, purgeRecordingsIfNeeded, purgeTimelapsesIfNeeded } from '../db/maintenance'
 import { generateText, currentProviderId } from '../providers/llmService'
 import type { TimelineCategory, DayGoalPlan, TimelineCardShell } from '../../shared/types'
@@ -18,6 +24,8 @@ import type { TimelineCategory, DayGoalPlan, TimelineCardShell } from '../../sha
 
 export function registerIpcHandlers(broadcast: (channel: string, payload?: unknown) => void): void {
   registerChatHandler(broadcast)
+  // Surface expired Claude logins to the UI so the user can re-authenticate.
+  claudeEvents.on('authRequired', () => broadcast('claude:authRequired'))
   // ----- Timeline -----
   ipcMain.handle('timeline:cardsForDay', (_e, day: string) => storage.fetchTimelineCardsForDay(day))
   ipcMain.handle('timeline:cardsByRange', (_e, fromTs: number, toTs: number) =>
@@ -132,6 +140,8 @@ export function registerIpcHandlers(broadcast: (channel: string, payload?: unkno
   ipcMain.handle('providers:testGemini', (_e, apiKey: string) => testGeminiConnection(apiKey))
   ipcMain.handle('providers:testLocal', () => testLocalConnection())
   ipcMain.handle('providers:testClaudeCli', () => testClaudeCli())
+  ipcMain.handle('providers:claudeAuth', () => checkClaudeAuth())
+  ipcMain.handle('providers:claudeLogin', () => openClaudeLogin())
   ipcMain.handle('providers:claudeCliInstalled', async () => (await resolveClaudeCli()) !== null)
   ipcMain.handle('providers:generateText', (_e, prompt: string, maxTokens?: number) =>
     generateText(prompt, maxTokens)

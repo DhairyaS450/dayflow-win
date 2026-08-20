@@ -1,0 +1,78 @@
+.claude-auth-banner {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 720px;
+  padding: 10px 14px;
+  background: var(--df-toast-bg);
+  border: 1px solid var(--df-toast-border);
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  animation: cab-in 260ms var(--ease-out-quart);
+}
+
+@keyframes cab-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.cab-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--df-toast-warning);
+  flex-shrink: 0;
+}
+
+.cab-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cab-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.86);
+}
+
+.cab-sub {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.62);
+}
+
+.cab-primary,
+.cab-secondary {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.cab-primary {
+  background: var(--df-toast-action-bg);
+  color: white;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.17);
+}
+
+.cab-secondary {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.cab-secondary:disabled {
+  opacity: 0.6;
+}

@@ -53,6 +53,19 @@ function createMainWindow(): void {
     }
   })
 
+  // A crashed or hung renderer must never leave a dead white window behind:
+  // reload it, and if the process is truly gone, recreate the page.
+  mainWindow.webContents.on('render-process-gone', (_e, details) => {
+    console.error('[window] renderer gone:', details.reason)
+    if (details.reason !== 'clean-exit') {
+      setTimeout(() => mainWindow?.webContents.reload(), 250)
+    }
+  })
+  mainWindow.on('unresponsive', () => {
+    console.error('[window] renderer unresponsive — reloading')
+    mainWindow?.webContents.forcefullyCrashRenderer()
+  })
+
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }

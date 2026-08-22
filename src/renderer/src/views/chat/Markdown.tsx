@@ -2,7 +2,7 @@
 // Blocks: headings, paragraphs, lists, blockquotes, fenced code, tables.
 // Inline: bold, italic, code, links.
 
-import type { ReactNode } from 'react'
+import { Component, type ReactNode } from 'react'
 import { api } from '../../lib/api'
 
 // ---------- Inline rendering ----------
@@ -27,9 +27,12 @@ export function renderInline(text: string, keyPrefix = 'i'): ReactNode[] {
   const nodes: ReactNode[] = []
   let last = 0
   let k = 0
-  INLINE_RE.lastIndex = 0
+  // Fresh regex per call: renderInline recurses (bold/italic/link content), and
+  // a shared /g regex's lastIndex gets reset by the inner call, making the
+  // outer loop re-match the same token forever.
+  const re = new RegExp(INLINE_RE.source, 'g')
   let m: RegExpExecArray | null
-  while ((m = INLINE_RE.exec(text)) !== null) {
+  while ((m = re.exec(text)) !== null) {
     if (m.index > last) nodes.push(text.slice(last, m.index))
     const t = m[0]
     const key = `${keyPrefix}-${k++}`
@@ -216,7 +219,7 @@ export function parseBlocks(src: string): Block[] {
 
 // ---------- Component ----------
 
-export default function Markdown(props: { text: string }): React.JSX.Element {
+function MarkdownInner(props: { text: string }): React.JSX.Element {
   const blocks = parseBlocks(props.text)
   return (
     <div className="md-root">
@@ -308,4 +311,33 @@ export default function Markdown(props: { text: string }): React.JSX.Element {
       })}
     </div>
   )
+}
+
+/**
+ * Guard rail: a parser bug on one message must never take down the renderer.
+ * On any render error, fall back to showing the raw text.
+ */
+export default class Markdown extends Component<{ text: string }, { failed: boolean }> {
+  state = { failed: false }
+
+  static getDerivedStateFromError(): { failed: boolean } {
+    return { failed: true }
+  }
+
+  componentDidUpdate(prev: { text: string }): void {
+    if (prev.text !== this.props.text && this.state.failed) {
+      this.setState({ failed: false })
+    }
+  }
+
+  render(): ReactNode {
+    if (this.state.failed) {
+      return (
+        <div className="md-root">
+          <p style={{ whiteSpace: 'pre-wrap' }}>{this.props.text}</p>
+        </div>
+      )
+    }
+    return <MarkdownInner text={this.props.text} />
+  }
 }
